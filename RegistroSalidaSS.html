@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Salida</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { width: 100%; padding: 10px; background: #4285F4; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h2>Registro de Salida</h2>
+    <form id="registroForm">
+        <label>Nombre:</label>
+        <input type="text" id="nombre" required>
+        
+        <label>Matrícula:</label>
+        <input type="text" id="matricula" required>
+        
+        <input type="hidden" id="tipo" value="Salida"> <!-- Tipo fijo -->
+        <input type="hidden" id="ubicacion"> <!-- Para geoloc -->
+        
+        <button type="button" onclick="registrar()">Registrar Salida</button>
+    </form>
+
+    <script>
+    function registrar() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            alert("Tu navegador no soporta geolocalización.");
+        }
+    }
+
+    function success(position) {
+        var lat = position.coords.latitude.toFixed(6);
+        var lon = position.coords.longitude.toFixed(6);
+        document.getElementById("ubicacion").value = "Lat: " + lat + ", Long: " + lon;
+
+        var formData = new FormData();
+        formData.append('nombre', document.getElementById("nombre").value);
+        formData.append('matricula', document.getElementById("matricula").value);
+        formData.append('tipo', document.getElementById("tipo").value);
+        formData.append('ubicacion', document.getElementById("ubicacion").value);
+
+        fetch('https://script.google.com/macros/s/AKfycbzs9JjPz0CMRPUWIIZnyIiSxCmMGdqdmt9w4nOaieNmNQVg9POxvQ2L8WKlXldH99jM/exec', {  // Reemplaza con tu URL
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+        });
+        alert("¡Salida registrada! Verifica la Sheet.");
+    }
+
+    function error(err) {
+        alert("No se pudo obtener la ubicación. Código: " + err.code + ". Actívala y recarga.");
+    }
+    </script>
+</body>
+</html>
