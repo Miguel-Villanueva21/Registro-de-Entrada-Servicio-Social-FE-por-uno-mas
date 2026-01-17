@@ -17,7 +17,7 @@
         <label>Matrícula:</label>
         <input type="text" id="matricula" required>
         
-        <input type="hidden" id="tipo" value="Salida"> <!-- Tipo fijo -->
+        <input type="hidden" id="tipo" value="Entrada"> <!-- Tipo fijo -->
         <input type="hidden" id="ubicacion"> <!-- Para geoloc -->
         
         <button type="button" onclick="registrar()">Registrar Salida</button>
@@ -28,33 +28,63 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(success, error);
         } else {
-            alert("Tu navegador no soporta geolocalización.");
+            alert("Tu navegador no soporta geolocalización. Actívala para continuar.");
         }
     }
 
     function success(position) {
         var lat = position.coords.latitude.toFixed(6);
         var lon = position.coords.longitude.toFixed(6);
-        document.getElementById("ubicacion").value = "Lat: " + lat + ", Long: " + lon;
+        var ubicacionStr = "Lat: " + lat + ", Long: " + lon;
+        document.getElementById("ubicacion").value = ubicacionStr;
 
+        // Coordenadas de la fundación (cámbialas por las reales)
+        var latFundacion = 25.667438;  // Ejemplo: Monterrey centro
+        var lonFundacion = -100.320075;
+        var rangoMax = 0.5;  // En km, ej: 100 metros = 0.1 km. Ajusta según necesites.
+
+        var distancia = calcularDistancia(lat, lon, latFundacion, lonFundacion);
+        
+        if (distancia > rangoMax) {
+            alert("No estás dentro del rango de la fundación (distancia: " + distancia.toFixed(2) + " km). Registro bloqueado.");
+            return;  // No envía
+        }
+
+        // Envía si está dentro del rango
         var formData = new FormData();
         formData.append('nombre', document.getElementById("nombre").value);
         formData.append('matricula', document.getElementById("matricula").value);
         formData.append('tipo', document.getElementById("tipo").value);
-        formData.append('ubicacion', document.getElementById("ubicacion").value);
+        formData.append('ubicacion', ubicacionStr);
 
         fetch('https://script.google.com/macros/s/AKfycbzs9JjPz0CMRPUWIIZnyIiSxCmMGdqdmt9w4nOaieNmNQVg9POxvQ2L8WKlXldH99jM/exec', {  // Reemplaza con tu URL
             method: 'POST',
             body: formData,
             mode: 'no-cors'
         });
-        alert("¡Salida registrada!");
+        alert("¡Salida registrada con éxito!");
     }
 
     function error(err) {
-        alert("No se pudo obtener la ubicación. Código: " + err.code + ". Actívala y recarga.");
+        alert("Geolocalización no activada o denegada. Actívala para registrar. Código: " + err.code);
+    }
+
+    // Fórmula Haversine para distancia en km
+    function calcularDistancia(lat1, lon1, lat2, lon2) {
+        var R = 6371;  // Radio de la Tierra en km
+        var dLat = deg2rad(lat2 - lat1);
+        var dLon = deg2rad(lon2 - lon1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;  // Distancia en km
+        return d;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
     }
     </script>
 </body>
-
 </html>
