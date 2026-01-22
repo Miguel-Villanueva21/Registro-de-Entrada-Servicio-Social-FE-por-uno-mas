@@ -11,7 +11,7 @@
 <body>
     <h2>Registro de Salida</h2>
     <form id="registroForm">
-        <label>Nombre:</label>
+        <label>Nombre Completo:</label>
         <input type="text" id="nombre" required>
         
         <label>Matrícula:</label>
@@ -20,7 +20,7 @@
         <input type="hidden" id="tipo" value="Salida"> <!-- Tipo fijo -->
         <input type="hidden" id="ubicacion"> <!-- Para geoloc -->
         
-        <button type="button" onclick="registrar()">Registrar Salida PRESIONAR SOLO 1 VEZ</button>
+        <button type="button" onclick="registrar()">Enviar PRESIONAR SOLO 1 VEZ</button>
     </form>
 
     <script>
@@ -41,7 +41,7 @@
         // Coordenadas de la fundación (cámbialas por las reales)
         var latFundacion = 25.720985;  // Ejemplo: Monterrey centro
         var lonFundacion = -100.345690;
-        var rangoMax = 50;  // En km, ej: 100 metros = 0.1 km. Ajusta según necesites.
+        var rangoMax = 0.5;  // En km, ej: 100 metros = 0.1 km. Ajusta según necesites.
 
         var distancia = calcularDistancia(lat, lon, latFundacion, lonFundacion);
         
@@ -88,6 +88,7 @@
     </script>
 </body>
 </html>
+
 
 
 
